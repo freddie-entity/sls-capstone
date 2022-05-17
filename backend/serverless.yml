@@ -23,7 +23,7 @@ provider:
     apiGateway: true
 
   environment:
-    TODOS_TABLE: Todos-${self:provider.stage}
+    TODOS_TABLE: TodosTable-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
     ATTACHMENT_S3_BUCKET: serverless-c4-todo-images-816436131251-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
@@ -34,7 +34,7 @@ provider:
   #   restApi: true
 
   iamRoleStatements:
-    - ${file(iam/XRayCommonIAM.yml):XRayCommon}
+    - ${file(iam/ObservabilityIAM.yml):XRayCommon}
 
 
 functions:
@@ -51,15 +51,8 @@ functions:
           cors: true
           authorizer: Auth
     iamRoleStatementsInherit: true
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:Query
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-      - Effect: Allow
-        Action:
-          - dynamodb:Query
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_CREATED_AT_INDEX}
+    iamRoleStatements: 
+      - ${file(iam/TodosTableIAM.yml):GetTodos}
 
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
@@ -73,11 +66,8 @@ functions:
             schema:
               application/json: ${file(src/validators/create-todo-model.json)}
     iamRoleStatementsInherit: true
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:PutItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+    iamRoleStatements: 
+      - ${file(iam/TodosTableIAM.yml):CreateTodo}
 
 
   UpdateTodo:
@@ -92,11 +82,8 @@ functions:
             schema:
               application/json: ${file(src/validators/update-todo-model.json)}
     iamRoleStatementsInherit: true
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:UpdateItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+    iamRoleStatements: 
+      - ${file(iam/TodosTableIAM.yml):UpdateTodo}
 
 
   DeleteTodo:
@@ -108,11 +95,8 @@ functions:
           authorizer: Auth
           cors: true
     iamRoleStatementsInherit: true
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:DeleteItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+    iamRoleStatements: 
+      - ${file(iam/TodosTableIAM.yml):DeleteTodo}
 
 
   GenerateUploadUrl:
@@ -125,20 +109,18 @@ functions:
           authorizer: Auth
     iamRoleStatementsInherit: true
     iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:UpdateItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-      - Effect: Allow
-        Action:
-          - s3:PutObject
-          - s3:GetObject
-        Resource: arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*
+      - ${file(iam/TodosTableIAM.yml):UpdateTodo}
+      - ${file(iam/AttachmentsBucketIAM.yml):GenerateUploadUrl}
 
 resources:
   Resources:
-    GatewayResponseDefault4XX: ${file(resources/GatewayResponseDefault.yml):GatewayResponseDefault}
+    GatewayResponseDefault4XX: ${file(resources/GatewayResponseDefault.yml):GatewayResponseDefault4XX}
     TodosTable: ${file(resources/TodosTable.yml):TodosTable}
     AttachmentsBucket: ${file(resources/AttachmentsBucket.yml):AttachmentsBucket}
     BucketPolicy: ${file(resources/AttachmentsBucket.yml):BucketPolicy}
     
+custom:
+  TodosTable:
+    name: !Ref TodosTable
+    arn: !GetAtt TodosTable.Arn
+  # Auth: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:auth-service-${self:provider.stage}-auth
