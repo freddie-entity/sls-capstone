@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Form, Button } from 'semantic-ui-react'
 import Auth from '../auth/Auth'
-import { getUploadUrl, uploadFile } from '../api/todos-api'
+import { getUploadUrl, uploadFile } from '../api/stories-api'
 
 enum UploadState {
   NoUpload,
@@ -12,7 +12,7 @@ enum UploadState {
 interface EditTodoProps {
   match: {
     params: {
-      todoId: string
+      storyId: string
     }
   }
   auth: Auth
@@ -23,7 +23,7 @@ interface EditTodoState {
   uploadState: UploadState
 }
 
-export class EditTodo extends React.PureComponent<
+export class EditStory extends React.PureComponent<
   EditTodoProps,
   EditTodoState
 > {
@@ -51,7 +51,7 @@ export class EditTodo extends React.PureComponent<
       }
 
       this.setUploadState(UploadState.FetchingPresignedUrl)
-      const uploadUrl = await getUploadUrl(this.props.auth.getIdToken(), this.props.match.params.todoId)
+      const uploadUrl = await getUploadUrl(this.props.auth.getIdToken(), this.props.match.params.storyId)
 
       this.setUploadState(UploadState.UploadingFile)
       await uploadFile(uploadUrl, this.state.file)
