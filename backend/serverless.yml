@@ -6,6 +6,7 @@ plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
   - serverless-plugin-tracing
+  - serverless-pseudo-parameters
 
 package:
   individually: true
@@ -39,8 +40,8 @@ provider:
 
 functions:
 
-  Auth:
-    handler: src/lambda/auth/auth0Authorizer.handler
+  # Auth:
+  #   handler: src/lambda/auth/auth0Authorizer.handler
 
   GetTodos:
     handler: src/lambda/http/getTodos.handler
@@ -49,7 +50,7 @@ functions:
           method: get
           path: todos
           cors: true
-          authorizer: Auth
+          authorizer: ${self.custom.Auth}
     iamRoleStatementsInherit: true
     iamRoleStatements: 
       - ${file(iam/TodosTableIAM.yml):GetTodos}
@@ -61,7 +62,7 @@ functions:
           method: post
           path: todos
           cors: true
-          authorizer: Auth
+          authorizer: ${self.custom.Auth}
           request:
             schema:
               application/json: ${file(src/validators/create-todo-model.json)}
@@ -76,7 +77,7 @@ functions:
       - http:
           method: patch
           path: todos/{todoId}
-          authorizer: Auth
+          authorizer: ${self.custom.Auth}
           cors: true
           request:
             schema:
@@ -92,7 +93,7 @@ functions:
       - http:
           method: delete
           path: todos/{todoId}
-          authorizer: Auth
+          authorizer: ${self.custom.Auth}
           cors: true
     iamRoleStatementsInherit: true
     iamRoleStatements: 
@@ -106,7 +107,7 @@ functions:
           method: post
           path: todos/{todoId}/attachment
           cors: true
-          authorizer: Auth
+          authorizer: ${self.custom.Auth}
     iamRoleStatementsInherit: true
     iamRoleStatements:
       - ${file(iam/TodosTableIAM.yml):UpdateTodo}
@@ -114,7 +115,7 @@ functions:
 
 resources:
   Resources:
-    GatewayResponseDefault4XX: ${file(resources/GatewayResponseDefault.yml):GatewayResponseDefault4XX}
+    # GatewayResponseDefault4XX: ${file(resources/GatewayResponseDefault.yml):GatewayResponseDefault4XX}
     TodosTable: ${file(resources/TodosTable.yml):TodosTable}
     AttachmentsBucket: ${file(resources/AttachmentsBucket.yml):AttachmentsBucket}
     BucketPolicy: ${file(resources/AttachmentsBucket.yml):BucketPolicy}
@@ -123,4 +124,4 @@ custom:
   TodosTable:
     name: !Ref TodosTable
     arn: !GetAtt TodosTable.Arn
-  # Auth: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:auth-service-${self:provider.stage}-auth
+  Auth: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:auth-service-${self:provider.stage}-Auth
