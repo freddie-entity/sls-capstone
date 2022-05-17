@@ -11,7 +11,9 @@ import {
   Icon,
   Input,
   Image,
-  Loader
+  Loader,
+  Card,
+  Label
 } from 'semantic-ui-react'
 
 import { createStory, deleteStory, getStories, patchStory } from '../api/stories-api'
@@ -56,7 +58,7 @@ export class Stories extends React.PureComponent<StoriesProps, StoriesState> {
         newContent: ''
       })
     } catch {
-      alert('Todo creation failed')
+      alert('Story creation failed')
     }
   }
 
@@ -67,7 +69,7 @@ export class Stories extends React.PureComponent<StoriesProps, StoriesState> {
         stories: this.state.stories.filter(todo => todo.storyId !== storyId)
       })
     } catch {
-      alert('Todo deletion failed')
+      alert('Story deletion failed')
     }
   }
 
@@ -104,7 +106,7 @@ export class Stories extends React.PureComponent<StoriesProps, StoriesState> {
   render() {
     return (
       <div>
-        <Header as="h1">Stories</Header>
+        <Header as="h1" textAlign='center'>Stories</Header>
 
         {this.rendercreateStoryInput()}
 
@@ -121,13 +123,13 @@ export class Stories extends React.PureComponent<StoriesProps, StoriesState> {
             action={{
               color: 'teal',
               labelPosition: 'left',
-              icon: 'add',
-              content: 'Share your thought',
+              icon: 'paw',
+              content: 'Share it',
               onClick: this.onTodoCreate
             }}
             fluid
             actionPosition="left"
-            placeholder="Express something..."
+            placeholder="Express your thoughts..."
             onChange={this.handleContentChange}
           />
         </Grid.Column>
@@ -148,7 +150,7 @@ export class Stories extends React.PureComponent<StoriesProps, StoriesState> {
 
   renderLoading() {
     return (
-      <Grid.Row>
+      <Grid.Row >
         <Loader indeterminate active inline="centered">
           Your stories
         </Loader>
@@ -161,40 +163,41 @@ export class Stories extends React.PureComponent<StoriesProps, StoriesState> {
       <Grid padded>
         {this.state.stories.map((todo, pos) => {
           return (
-            <Grid.Row key={todo.storyId}>
-              <Grid.Column width={1} verticalAlign="middle">
-                <Checkbox
-                  onChange={() => this.onTodoCheck(pos)}
-                  checked={todo.isArchive}
-                />
-              </Grid.Column>
-              <Grid.Column width={10} verticalAlign="middle">
-                {todo.content}
-              </Grid.Column>
-              <Grid.Column width={3} floated="right">
-                {todo.dueDate}
-              </Grid.Column>
-              <Grid.Column width={1} floated="right">
-                <Button
-                  icon
-                  color="blue"
-                  onClick={() => this.onEditButtonClick(todo.storyId)}
-                >
-                  <Icon name="pencil" />
-                </Button>
-              </Grid.Column>
-              <Grid.Column width={1} floated="right">
-                <Button
-                  icon
-                  color="red"
-                  onClick={() => this.onTodoDelete(todo.storyId)}
-                >
-                  <Icon name="delete" />
-                </Button>
-              </Grid.Column>
-              {todo.storyImageUrl && (
-                <Image src={todo.storyImageUrl} size="small" wrapped />
-              )}
+            <Grid.Row key={todo.storyId} textAlign='center'>
+              <Card>
+                {todo.storyImageUrl && (
+                  <Image src={todo.storyImageUrl} wrapped ui={false} />
+                )}
+                <Card.Content>
+                  <Card.Header>{todo.content}</Card.Header>
+                  <Card.Meta>Created at: {todo.timestamp}</Card.Meta>
+                  <Card.Description>
+                    Expiration: {todo.dueDate}
+                  </Card.Description>
+                </Card.Content>
+                <Card.Content extra textAlign="center">
+                  <Label onChange={() => this.onTodoCheck(pos)}>
+                    <Icon name='archive'circular />
+                    {todo.isArchive ? "Archived" : "Archive"}   
+                  </Label>
+                  <div style={{paddingTop: 10}}>
+                    <Checkbox
+                      toggle
+                      onChange={() => this.onTodoCheck(pos)}
+                      checked={todo.isArchive}
+                    />
+                  </div>
+                  <Divider />
+                  <div className='ui two buttons'>
+                    <Button basic color='green' onClick={() => this.onEditButtonClick(todo.storyId)}>
+                      <Icon name="pencil" />
+                    </Button>
+                    <Button basic color='red' onClick={() => this.onTodoDelete(todo.storyId)}>
+                      <Icon name="delete" />
+                    </Button>
+                  </div>
+                </Card.Content>
+              </Card>
               <Grid.Column width={16}>
                 <Divider />
               </Grid.Column>

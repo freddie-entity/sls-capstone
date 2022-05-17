@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Link, Route, Router, Switch } from 'react-router-dom'
-import { Grid, Menu, Segment } from 'semantic-ui-react'
+import { Grid, Icon, Menu, Segment } from 'semantic-ui-react'
 
 import Auth from './auth/Auth'
 import { EditStory } from './components/EditStory'
@@ -55,9 +55,9 @@ export default class App extends Component<AppProps, AppState> {
 
   generateMenu() {
     return (
-      <Menu>
+      <Menu color="violet">
         <Menu.Item name="home">
-          <Link to="/">Home</Link>
+          <Link to="/"><Icon name='home' size='big' /></Link>
         </Menu.Item>
 
         <Menu.Menu position="right">{this.logInLogOutButton()}</Menu.Menu>
@@ -69,13 +69,13 @@ export default class App extends Component<AppProps, AppState> {
     if (this.props.auth.isAuthenticated()) {
       return (
         <Menu.Item name="logout" onClick={this.handleLogout}>
-          Log Out
+          Logout
         </Menu.Item>
       )
     } else {
       return (
         <Menu.Item name="login" onClick={this.handleLogin}>
-          Log In
+          Login
         </Menu.Item>
       )
     }

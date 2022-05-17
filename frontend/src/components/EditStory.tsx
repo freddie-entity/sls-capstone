@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Form, Button } from 'semantic-ui-react'
+import { Form, Button, Label } from 'semantic-ui-react'
 import Auth from '../auth/Auth'
 import { getUploadUrl, uploadFile } from '../api/stories-api'
 
@@ -73,11 +73,10 @@ export class EditStory extends React.PureComponent<
   render() {
     return (
       <div>
-        <h1>Upload new image</h1>
-
+        <Label color='red' horizontal size='big'>Upload image</Label>
         <Form onSubmit={this.handleSubmit}>
           <Form.Field>
-            <label>File</label>
+            <label>Image</label>
             <input
               type="file"
               accept="image/*"

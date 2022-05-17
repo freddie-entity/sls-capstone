@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Auth from '../auth/Auth'
-import { Button } from 'semantic-ui-react'
+import { Button, Icon, Header } from 'semantic-ui-react'
 
 interface LogInProps {
   auth: Auth
@@ -16,10 +16,16 @@ export class LogIn extends React.PureComponent<LogInProps, LogInState> {
   render() {
     return (
       <div>
-        <h1>Please log in</h1>
+        <Header as='h2' icon textAlign='center'>
+          <Icon name='newspaper outline' circular />
+          <Header.Content>Save your own stories</Header.Content>
+        </Header>
 
-        <Button onClick={this.onLogin} size="huge" color="olive">
-          Log in
+        <Button animated onClick={this.onLogin} color='violet' size='massive'>
+          <Button.Content visible>Login</Button.Content>
+          <Button.Content hidden>
+            <Icon name='arrow right' />
+          </Button.Content>
         </Button>
       </div>
     )
