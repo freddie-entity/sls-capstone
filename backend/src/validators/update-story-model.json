@@ -1,9 +1,9 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "updateToDo",
+  "title": "updateStory",
   "type": "object",
   "properties": {
-    "name": {
+    "content": {
       "type": "string",
       "pattern": "^(?!\\s*$).+",
       "minLength": 3
@@ -11,18 +11,18 @@
     "dueDate": {
       "type": "string"
     },
-    "done": {
+    "isArchive": {
       "type": "boolean"
     }
   },
   "required": [
-    "name",
+    "content",
     "dueDate",
-    "done"
+    "isArchive"
   ],
   "additionalProperties": {
       "properties":{
-          "attachmentUrl":{
+          "storyImageUrl":{
               "type":"string"
           }
       }

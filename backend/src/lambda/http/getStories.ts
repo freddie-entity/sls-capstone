@@ -3,18 +3,17 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
 
-// import { getTodosForUser as getTodosForUser } from '../../helper/todos'
-import { getToDos } from '../../helpers/todos'
+import { getStories } from '../../helpers/stories'
 import { getUserId } from '../utils';
 import { createLogger } from '../../utils/logger'
 
-const logger = createLogger('ToDoGET')
+const logger = createLogger('StoryGET')
 
 export const handler = 
   middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     logger.info('Processing event: ', event)
   
-    const items = await getToDos(getUserId(event));
+    const items = await getStories(getUserId(event));
     
     logger.info(items);
 

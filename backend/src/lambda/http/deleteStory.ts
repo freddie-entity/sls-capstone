@@ -3,35 +3,29 @@ import 'source-map-support/register'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
-import { getUploadUrl, updateStoryImageUrl } from '../../helpers/imageUtils'
+
+import { deleteStory } from '../../helpers/stories'
 import { getUserId } from '../utils'
 import { createLogger } from '../../utils/logger'
 
-const logger = createLogger('GenerateStoryImageUrlPOST')
+const logger = createLogger('StoryDELETE')
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     logger.info('Processing event: ', event)
     const storyId = event.pathParameters.storyId
+    const isDeleted = await deleteStory(storyId, getUserId(event))
+    if (isDeleted)
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                message: `Deleted item with ID: ${storyId} of User ${getUserId(event)}`
+            })
+        }
     
-    
-    try {
-      const url = getUploadUrl(storyId);
-      await updateStoryImageUrl(storyId, getUserId(event));
-      return {
-          statusCode: 201,
-          body: JSON.stringify({
-            uploadUrl: url,
-          })
-      };
-    }
-    catch(err) {
-      return {
-          statusCode: 400,
-          body: JSON.stringify({
-            error: err,
-          })
-      };
+    return {
+        statusCode: 400,
+        body: `Error while deleting story ID: ${storyId} of User ${getUserId(event)}`
     }
   }
 )

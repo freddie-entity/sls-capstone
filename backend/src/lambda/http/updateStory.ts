@@ -4,21 +4,21 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
 
-import { updateToDo } from '../../helpers/todos'
-import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
+import { updateStory } from '../../helpers/stories'
+import { UpdateStoryRequest } from '../../requests/UpdateStoryRequest'
 import { getUserId } from '../utils'
 import { createLogger } from '../../utils/logger'
 
-const logger = createLogger('ToDoPATCH')
+const logger = createLogger('StoryPATCH')
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     logger.info('Processing event: ', event)
-    const todoId = event.pathParameters.todoId
-    const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
+    const storyId = event.pathParameters.storyId
+    const updatedStory: UpdateStoryRequest = JSON.parse(event.body)
 
     try {
-        await updateToDo(todoId, getUserId(event), updatedTodo)
+        await updateStory(storyId, getUserId(event), updatedStory)
         return {
             statusCode: 200,
             body: ''
@@ -26,7 +26,7 @@ export const handler = middy(
     } catch (error) {   
         return {
             statusCode: 400,
-            body: "Error while updating todo: " + JSON.stringify(error)
+            body: "Error while updating story: " + JSON.stringify(error)
         }
     }
 }

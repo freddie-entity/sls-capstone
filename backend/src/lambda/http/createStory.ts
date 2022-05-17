@@ -2,20 +2,20 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import 'source-map-support/register'
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
-import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
-import { createToDo } from '../../helpers/todos'
+import { CreateStoryRequest } from '../../requests/CreateStoryRequest'
+import { createStory } from '../../helpers/stories'
 import { getUserId } from '../utils'
 import { createLogger } from '../../utils/logger'
 
-const logger = createLogger('ToDoPOST')
+const logger = createLogger('StoryPOST')
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     logger.info('Processing event: ', event)
-    const newTodo: CreateTodoRequest = JSON.parse(event.body)
+    const newStory: CreateStoryRequest = JSON.parse(event.body)
 
     try {
-        const item = await createToDo(newTodo, getUserId(event))
+        const item = await createStory(newStory, getUserId(event))
         return {
             statusCode: 201,
             body: JSON.stringify({
@@ -25,7 +25,7 @@ export const handler = middy(
     } catch (error) {   
         return {
             statusCode: 400,
-            body: "Error while creating todo: " + JSON.stringify(error)
+            body: "Error while creating story: " + JSON.stringify(error)
         }
     }
   }

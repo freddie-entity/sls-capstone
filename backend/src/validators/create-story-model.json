@@ -1,9 +1,9 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "todo",
+  "title": "story-create",
   "type": "object",
   "properties": {
-    "name": {
+    "content": {
       "type": "string",
       "pattern": "^(?!\\s*$).+",
       "minLength": 3
@@ -13,7 +13,7 @@
     }
   },
   "required": [
-    "name",
+    "content",
     "dueDate"
   ],
   "additionalProperties": false

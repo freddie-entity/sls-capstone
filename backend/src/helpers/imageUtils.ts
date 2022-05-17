@@ -8,35 +8,35 @@ const s3 = new XAWS.S3({
   signatureVersion: 'v4'
 })
 
-const bucketName = process.env.ATTACHMENT_S3_BUCKET;
+const bucketName = process.env.STORY_IMAGE_S3_BUCKET;
 const urlExpiration = process.env.SIGNED_URL_EXPIRATION;
 const docClient: DocumentClient = createDynamoDBClient();
-const toDosTable = process.env.TODOS_TABLE;
+const storiesTable = process.env.STORIES_TABLE;
 
-export function getUploadUrl(todoId: string) {
+export function getUploadUrl(storyId: string) {
     
     return s3.getSignedUrl('putObject', {
         Bucket: bucketName,
-        Key: todoId,
+        Key: storyId,
         Expires: parseInt(urlExpiration)
     })
 }
 
-export async function updateToDoAttachmentUrl(todoId: string, userId: string) {
+export async function updateStoryImageUrl(storyId: string, userId: string) {
     await docClient.update({
-        TableName: toDosTable,
+        TableName: storiesTable,
         Key: {
             userId: userId,
-            todoId: todoId
+            storyId: storyId
         },
         ExpressionAttributeNames: {
-            '#attachmentUrlToDo': 'attachmentUrl',
+            '#storyImageUrl': 'storyImageUrl',
         },
         ExpressionAttributeValues: {
-        ":attachmentUrl": `https://${bucketName}.s3.amazonaws.com/${todoId}`
+        ":storyImageUrl": `https://${bucketName}.s3.amazonaws.com/${storyId}`
         },
         UpdateExpression:
-            "SET #attachmentUrlToDo = :attachmentUrl",
+            "SET #storyImageUrl = :storyImageUrl",
         ReturnValues: "UPDATED_NEW"
     }).promise()
 }

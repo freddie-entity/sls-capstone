@@ -1,0 +1,25 @@
+GetStories:
+    Effect: Allow
+    Action:
+        - dynamodb:Query
+    Resource: 
+        - ${self:custom.StoriesTable.arn}
+        # - ${self:custom.StoriesTable.arn}/index/${self:provider.environment.STORIES_TIMESTAMP_INDEX}
+
+CreateStory:
+    Effect: Allow
+    Action:
+        - dynamodb:PutItem
+    Resource: ${self:custom.StoriesTable.arn}
+    
+UpdateStory:
+    Effect: Allow
+    Action:
+        - dynamodb:UpdateItem
+    Resource: ${self:custom.StoriesTable.arn}
+    
+DeleteStory:
+    Effect: Allow
+    Action:
+        - dynamodb:DeleteItem
+    Resource: ${self:custom.StoriesTable.arn}

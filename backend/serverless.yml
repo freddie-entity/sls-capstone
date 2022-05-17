@@ -1,12 +1,11 @@
 # org: freddieentity
-# app: serverless-todo-app
-service: serverless-todo-app
+# app: stories
+service: stories
 
 plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
   - serverless-plugin-tracing
-  - serverless-pseudo-parameters
 
 package:
   individually: true
@@ -24,9 +23,9 @@ provider:
     apiGateway: true
 
   environment:
-    TODOS_TABLE: TodosTable-${self:provider.stage}
-    TODOS_CREATED_AT_INDEX: CreatedAtIndex
-    ATTACHMENT_S3_BUCKET: serverless-c4-todo-images-816436131251-${self:provider.stage}
+    STORIES_TABLE: StoriesTable-${self:provider.stage}
+    STORIES_TIMESTAMP_INDEX: TimestampIndex
+    STORY_IMAGE_S3_BUCKET: story-images-816436131251-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
     AUTH_0_JWKS_URL: https://dev-tp1uyfva.au.auth0.com/.well-known/jwks.json
 
@@ -40,64 +39,64 @@ provider:
 
 functions:
 
-  # Auth:
-  #   handler: src/lambda/auth/auth0Authorizer.handler
+  Auth:
+    handler: src/lambda/auth/auth0Authorizer.handler
 
-  GetTodos:
-    handler: src/lambda/http/getTodos.handler
+  GetStories:
+    handler: src/lambda/http/getStories.handler
     events:
       - http:
           method: get
-          path: todos
+          path: stories
           cors: true
-          authorizer: ${self.custom.Auth}
+          authorizer: Auth
     iamRoleStatementsInherit: true
     iamRoleStatements: 
-      - ${file(iam/TodosTableIAM.yml):GetTodos}
+      - ${file(iam/StoriesTableIAM.yml):GetStories}
 
-  CreateTodo:
-    handler: src/lambda/http/createTodo.handler
+  CreateStory:
+    handler: src/lambda/http/createStory.handler
     events:
       - http:
           method: post
-          path: todos
+          path: stories
           cors: true
-          authorizer: ${self.custom.Auth}
+          authorizer: Auth
           request:
             schema:
-              application/json: ${file(src/validators/create-todo-model.json)}
+              application/json: ${file(src/validators/create-story-model.json)}
     iamRoleStatementsInherit: true
     iamRoleStatements: 
-      - ${file(iam/TodosTableIAM.yml):CreateTodo}
+      - ${file(iam/StoriesTableIAM.yml):CreateStory}
 
 
-  UpdateTodo:
-    handler: src/lambda/http/updateTodo.handler
+  UpdateStory:
+    handler: src/lambda/http/updateStory.handler
     events:
       - http:
           method: patch
-          path: todos/{todoId}
-          authorizer: ${self.custom.Auth}
+          path: stories/{storyId}
+          authorizer: Auth
           cors: true
           request:
             schema:
-              application/json: ${file(src/validators/update-todo-model.json)}
+              application/json: ${file(src/validators/update-story-model.json)}
     iamRoleStatementsInherit: true
     iamRoleStatements: 
-      - ${file(iam/TodosTableIAM.yml):UpdateTodo}
+      - ${file(iam/StoriesTableIAM.yml):UpdateStory}
 
 
-  DeleteTodo:
-    handler: src/lambda/http/deleteTodo.handler
+  DeleteStory:
+    handler: src/lambda/http/deleteStory.handler
     events:
       - http:
           method: delete
-          path: todos/{todoId}
-          authorizer: ${self.custom.Auth}
+          path: stories/{storyId}
+          authorizer: Auth
           cors: true
     iamRoleStatementsInherit: true
     iamRoleStatements: 
-      - ${file(iam/TodosTableIAM.yml):DeleteTodo}
+      - ${file(iam/StoriesTableIAM.yml):DeleteStory}
 
 
   GenerateUploadUrl:
@@ -105,23 +104,22 @@ functions:
     events:
       - http:
           method: post
-          path: todos/{todoId}/attachment
+          path: stories/{storyId}/image
           cors: true
-          authorizer: ${self.custom.Auth}
+          authorizer: Auth
     iamRoleStatementsInherit: true
     iamRoleStatements:
-      - ${file(iam/TodosTableIAM.yml):UpdateTodo}
-      - ${file(iam/AttachmentsBucketIAM.yml):GenerateUploadUrl}
+      - ${file(iam/StoriesTableIAM.yml):UpdateStory}
+      - ${file(iam/StoryImagesBucketIAM.yml):GenerateUploadUrl}
 
 resources:
   Resources:
-    # GatewayResponseDefault4XX: ${file(resources/GatewayResponseDefault.yml):GatewayResponseDefault4XX}
-    TodosTable: ${file(resources/TodosTable.yml):TodosTable}
-    AttachmentsBucket: ${file(resources/AttachmentsBucket.yml):AttachmentsBucket}
-    BucketPolicy: ${file(resources/AttachmentsBucket.yml):BucketPolicy}
+    GatewayResponseDefault4XX: ${file(resources/GatewayResponseDefault.yml):GatewayResponseDefault4XX}
+    StoriesTable: ${file(resources/StoriesTable.yml):StoriesTable}
+    StoryImagesBucket: ${file(resources/StoryImagesBucket.yml):StoryImagesBucket}
+    BucketPolicy: ${file(resources/StoryImagesBucket.yml):BucketPolicy}
     
 custom:
-  TodosTable:
-    name: !Ref TodosTable
-    arn: !GetAtt TodosTable.Arn
-  Auth: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:auth-service-${self:provider.stage}-Auth
+  StoriesTable:
+    name: !Ref StoriesTable
+    arn: !GetAtt StoriesTable.Arn

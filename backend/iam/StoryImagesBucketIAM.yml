@@ -3,4 +3,4 @@ GenerateUploadUrl:
     Action:
       - s3:PutObject
       - s3:GetObject
-    Resource: arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*
+    Resource: arn:aws:s3:::${self:provider.environment.STORY_IMAGE_S3_BUCKET}/*
