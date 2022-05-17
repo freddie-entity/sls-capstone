@@ -1,6 +1,0 @@
-XRayCommon:
-  Effect: Allow
-  Action:
-    - xray:PutTelemetryRecords
-    - xray:PutTraceSegments
-  Resource: "*"

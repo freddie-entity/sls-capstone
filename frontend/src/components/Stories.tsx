@@ -160,7 +160,7 @@ export class Stories extends React.PureComponent<StoriesProps, StoriesState> {
 
   renderStoriesList() {
     return (
-      <Grid padded>
+      <Grid padded textAlign='center'>
         {this.state.stories.map((todo, pos) => {
           return (
             <Grid.Row key={todo.storyId} textAlign='center'>
