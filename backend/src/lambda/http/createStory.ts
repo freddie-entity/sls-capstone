@@ -3,7 +3,7 @@ import 'source-map-support/register'
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
 import { CreateStoryRequest } from '../../requests/CreateStoryRequest'
-import { createStory } from '../../helpers/stories'
+import { createStory } from '../../businessLogic/stories'
 import { getUserId } from '../utils'
 import { createLogger } from '../../utils/logger'
 

@@ -1,12 +1,8 @@
-import { StoriesAccess } from './storiesAccess'
-// import { AttachmentUtils } from './imageUtils';
+import { StoriesAccess } from '../dataLayer/storiesAccess'
 import { StoryItem } from '../models/StoryItem'
 import { CreateStoryRequest } from '../requests/CreateStoryRequest'
-// import { UpdateStoryRequest } from '../requests/UpdateStoryRequest'
-// import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
 import { StoryUpdate } from '../models/StoryUpdate'
-// import * as createError from 'http-errors'
 
 const storyAccess = new StoriesAccess()
 
